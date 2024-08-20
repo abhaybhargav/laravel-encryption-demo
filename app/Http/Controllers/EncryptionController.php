@@ -10,12 +10,13 @@ class EncryptionController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth')->except('index');
+        // $this->middleware('auth')->except('index');
     }
 
     public function index()
     {
-        $data = auth()->check() ? SensitiveData::all() : collect();
+        $data=SensitiveData::all();
+        // $data = auth()->check() ? SensitiveData::all() : collect();
         return view('encryption.index', compact('data'));
     }
 
@@ -46,7 +47,7 @@ class EncryptionController extends Controller
     public function decrypt($id)
     {
         $sensitiveData = SensitiveData::findOrFail($id);
-        
+
         if ($sensitiveData->mode === 'secure') {
             $decryptedData = Crypt::decryptString($sensitiveData->encrypted_data);
         } else {

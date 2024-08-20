@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EncryptionController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,10 +14,10 @@ use App\Http\Controllers\EncryptionController;
 |
 */
 
-// Authentication Routes
-Auth::routes();
+Route::get('/', function () {
+    return view('welcome');
+});
 
-// Home Route
 Route::get('/', [EncryptionController::class, 'index'])->name('home');
 
 // Encryption Routes
