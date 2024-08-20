@@ -1,5 +1,5 @@
 # Use an official PHP runtime as a parent image
-FROM php:8.1-apache
+FROM php:8.2-apache
 
 # Set working directory
 WORKDIR /var/www/html
@@ -27,6 +27,13 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Copy application files
 COPY . .
 
+# Apache2 Configuration file
+COPY apache2.conf /etc/apache2/sites-available/000-default.conf
+
+# Create necessary directories and files
+RUN touch /var/www/html/database/database.sqlite
+RUN chown www-data:www-data /var/www/html/database/database.sqlite
+
 # Create storage and cache directories if they do not exist
 RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache
 
@@ -36,6 +43,9 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Debug step: Check if artisan file exists
 RUN ls -la /var/www/html
+
+# Ensure artisan file is executable
+RUN chmod +x /var/www/html/artisan
 
 # Copy the environment file
 RUN cp .env.example .env
@@ -56,15 +66,13 @@ USER root
 RUN ls -la /var/www/html
 
 # Ensure artisan file exists before running commands
+# RUN if [ -f "artisan" ]; then php artisan migrate --force; else echo "artisan file not found"; fi
 RUN if [ -f "artisan" ]; then php artisan key:generate --force; else echo "artisan file not found"; fi
 RUN if [ -f "artisan" ]; then php artisan config:cache; else echo "artisan file not found"; fi
 RUN if [ -f "artisan" ]; then php artisan package:discover --ansi; else echo "artisan file not found"; fi
 
-# Switch back to www-data user
-USER www-data
-
 # Expose port 80 (Apache default)
 EXPOSE 80
 
-# Start Apache server
-CMD ["apache2-foreground"]
+# # Start Apache server
+# CMD ["apache2-foreground"]
